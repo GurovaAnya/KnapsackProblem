@@ -1,42 +1,91 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace KnapsackProblem
 {
-    /// <summary>
-    /// Здесь будет куча!
-    /// </summary>
+    // Здесь будет куча!
     class Heap
     {
-        public List<Node> heap;
+        private List<Node> heap;
+
+        public int HeapSize
+        {
+            get
+            {
+                return heap.Count;
+            }
+        }
 
         public Heap()
         {
             heap = new List<Node>();
         }
 
-        //Добавление элемента
-        public void Add(Node node)
+        public void Add(Node value)
         {
-            heap.Add(node);
+            heap.Add(value);
+            int i = HeapSize - 1;
+            int parent = (i - 1) / 2;
+
+            while (i > 0 && heap[parent].Func < heap[i].Func)
+            {
+                Node temp = heap[i];
+                heap[i] = heap[parent];
+                heap[parent] = temp;
+
+                i = parent;
+                parent = (i - 1) / 2;
+            }
         }
 
-        //нахождение элемента с максимальной оценкой (Func). Желательно, чтобы возвращал с максимальным значением уровня (Level)
+        public void Heapify(int i)
+        {
+            int leftChild;
+            int rightChild;
+            int largestChild;
+
+            for (; ; )
+            {
+                leftChild = 2 * i + 1;
+                rightChild = 2 * i + 2;
+                largestChild = i;
+
+                if (leftChild < HeapSize && heap[leftChild].Func > heap[largestChild].Func)
+                {
+                    largestChild = leftChild;
+                }
+
+                if (rightChild < HeapSize && heap[rightChild].Func > heap[largestChild].Func )
+                {
+                    largestChild = rightChild;
+                }
+
+                if (largestChild == i)
+                {
+                    break;
+                }
+
+                Node temp = heap[i];
+                heap[i] = heap[largestChild];
+                heap[largestChild] = temp;
+                i = largestChild;
+            }
+        }
+
         public Node GetMaximum()
         {
-            Node max = heap[0];
-            for (int i = 1; i < heap.Count; i++)
-                if (heap[i].Func > max.Func)
-                    max = heap[i];
-            return max;
+            Node result = heap[0];
+            heap[0] = heap[HeapSize - 1];
+            heap.RemoveAt(HeapSize - 1);
+            Heapify(0);
+            return result;
         }
 
-        //Удаление элемента
         public bool Remove(Node node)
         {
             return heap.Remove(node);
         }
-
     }
 }
